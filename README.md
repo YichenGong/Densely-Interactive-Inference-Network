@@ -22,7 +22,7 @@ When you finish downloading, the folder should look like this:
 	glove.840B.300d.txt  multinli_0.9  shared.jsonl  snli_1.0
 	$ cd ..
 
-I don't recommend you to use multinli_1.0 here unless you want to spend 12 hours on preprocessing all the content again. If you really do, you need to manually edit path from 0.9 to 1.0 at python/util/parameters.py and delete shared.jsonl file. 
+I don't recommend you to use multinli_1.0 here because the id doesn't match the id in preprocessed sample id.
 
 ## To run the code
 	$ cd python 

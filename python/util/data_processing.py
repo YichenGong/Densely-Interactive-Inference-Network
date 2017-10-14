@@ -125,69 +125,29 @@ def worker(shared_content, dataset):
         string = re.sub(r'\(|\)', '', string)
         return string.split()
 
-    st = StanfordNERTagger('/scratch/yg1053/Stanford/stanford-ner-2014-08-27/classifiers/english.muc.7class.distsim.crf.ser.gz', '/scratch/yg1053/Stanford/stanford-ner-2014-08-27/stanford-ner.jar',encoding='utf-8')
-    # st = StanfordNERTagger('/opt/hdfs/user/yichen.gong/nltk/Stanford/stanford-ner-2014-08-27/classifiers/english.muc.7class.distsim.crf.ser.gz', '/opt/hdfs/user/yichen.gong/nltk/Stanford/stanford-ner-2014-08-27/stanford-ner.jar',encoding='utf-8')
-    # st = StanfordNERTagger('/opt/hdfs/user/yichen.gong/nltk/Stanford/stanford-ner-2014-08-27/classifiers/english.conll.4class.distsim.crf.ser.gz', '/opt/hdfs/user/yichen.gong/nltk/Stanford/stanford-ner-2014-08-27/stanford-ner.jar',encoding='utf-8')
-    NER_classes = "Location, Person, Organization, Money, Percent, Date, Time".split(", ")
-
-    # NER_classes = "Location, Person, Organization, Misc".split(", ")
-    NER_indices = {k.upper(): idx for  idx, k in enumerate(NER_classes)}
-
-    print(NER_indices)
     for example in tqdm(dataset):
             s1_tokenize = tokenize(example['sentence1_binary_parse'])
             s2_tokenize = tokenize(example['sentence2_binary_parse'])
 
-            s1_NER_tags = st.tag(s1_tokenize)
-            s2_NER_tags = st.tag(s2_tokenize)
-            # print(s1_NER_tags)
-            # print(s2_NER_tags)
 
-            s1_NER_feature = [[0]*7 for i in range(len(s1_tokenize))]
-            s2_NER_feature = [[0]*7 for i in range(len(s2_tokenize))]
-
-            for idx, pair in enumerate(s1_NER_tags):
-                word, tag = pair 
-                if tag == "O":
-                    continue
-                s1_NER_feature[idx][NER_indices[tag]] = 1
-
-            for idx, pair in enumerate(s2_NER_tags):
-                word, tag = pair 
-                if tag == "O":
-                    continue
-                s2_NER_feature[idx][NER_indices[tag]] = 1
-
-            # print(s2_NER_feature)
-
-
-
-            # s1_token_exact_match = [0] * len(s1_tokenize)
-            # s2_token_exact_match = [0] * len(s2_tokenize)
-            # s1_token_antonym = [0] * len(s1_tokenize)
-            # s2_token_antonym = [0] * len(s2_tokenize)
-            # for i, word in enumerate(s1_tokenize):
-            #     matched = False
-            #     for j, w2 in enumerate(s2_tokenize):
-            #         matched = is_exact_match(word, w2)
-            #         if matched:
-            #             s1_token_exact_match[i] = 1
-            #             s2_token_exact_match[j] = 1
+            s1_token_exact_match = [0] * len(s1_tokenize)
+            s2_token_exact_match = [0] * len(s2_tokenize)
+            s1_token_antonym = [0] * len(s1_tokenize)
+            s2_token_antonym = [0] * len(s2_tokenize)
+            for i, word in enumerate(s1_tokenize):
+                matched = False
+                for j, w2 in enumerate(s2_tokenize):
+                    matched = is_exact_match(word, w2)
+                    if matched:
+                        s1_token_exact_match[i] = 1
+                        s2_token_exact_match[j] = 1
                          
-                    
-            #         antonymed = is_antonyms(word, w2)
-            #         if antonymed:
-            #             s1_token_antonym[i] = 1
-            #             s2_token_antonym[j] = 1
+    
             
             content = {}
 
-            # content['sentence1_token_exact_match_with_s2'] = s1_token_exact_match
-            # content['sentence2_token_exact_match_with_s1'] = s2_token_exact_match
-            # content['sentence1_antonym_feature'] = s1_token_antonym
-            # content['sentence2_antonym_feature'] = s2_token_antonym
-            content['sentence1_NER_feature'] = s1_NER_feature
-            content['sentence2_NER_feature'] = s2_NER_feature
+            content['sentence1_token_exact_match_with_s2'] = s1_token_exact_match
+            content['sentence2_token_exact_match_with_s1'] = s2_token_exact_match
             shared_content[example["pairID"]] = content
             # print(shared_content[example["pairID"]])
     # print(shared_content)
