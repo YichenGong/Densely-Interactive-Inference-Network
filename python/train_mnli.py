@@ -315,7 +315,7 @@ class modelClassifier:
                         self.best_step = self.step
                         logger.Log("Checkpointing with new best matched-dev accuracy: %f" %(self.best_dev_mat))
 
-                if self.best_dev_mat > 0.780 and not config.training_completely_on_snli:
+                if self.best_dev_mat > 0.777 and not config.training_completely_on_snli:
                     self.eval_step = 500
                     self.save_step = 500
                     if config.discard_failed_sample:
@@ -323,7 +323,7 @@ class modelClassifier:
 
 
 
-                if self.best_dev_mat > 0.783 and not config.training_completely_on_snli:
+                if self.best_dev_mat > 0.780 and not config.training_completely_on_snli:
                     self.eval_step = 100
                     self.save_step = 100
                     self.dont_print_unnecessary_info = True 
