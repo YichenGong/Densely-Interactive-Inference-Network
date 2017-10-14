@@ -142,8 +142,6 @@ class modelClassifier:
 
     def get_minibatch(self, dataset, start_index, end_index, training=False):
         indices = range(start_index, end_index)
-        if config.discard_failed_sample and training:
-            indices = [i for i in indices if dataset[i].get("FAILED_TIMES", 0) <= config.discard_sample_threshold]
 
         genres = [dataset[i]['genre'] for i in indices]
         labels = [dataset[i]['label'] for i in indices]
@@ -219,7 +217,7 @@ class modelClassifier:
         ### Training cycle
         logger.Log("Training...")
         logger.Log("Model will use %s percent of SNLI data during training" %(self.alpha * 100))
-        positional_encoding = self.get_positional_encoding(self.sequence_length, 300)
+
         while True:
             if config.training_completely_on_snli:
                 training_data = train_snli
@@ -229,10 +227,7 @@ class modelClassifier:
 
             else:
                 training_data = train_mnli + random.sample(train_snli, beta)
-                if config.train_with_dev_data_at_the_end and self.train_dev_set:
-                    training_data += random.sample(dev_snli, beta)
-                    training_data += dev_mat 
-                    training_data += dev_mismat
+                
             random.shuffle(training_data)
             avg_cost = 0.
             total_batch = int(len(training_data) / self.batch_size)
@@ -360,31 +355,22 @@ class modelClassifier:
             self.last_train_acc[(self.epoch % 5) - 1] = mtrain_acc
 
             # Early stopping
-            self.early_stopping_step = 10000000 if config.subword_random_init_embedding else 35000
+            self.early_stopping_step = 35000
             progress = 1000 * (sum(self.last_train_acc)/(5 * min(self.last_train_acc)) - 1) 
 
-            if config.train_with_dev_data_at_the_end:
-                if (progress < 0.1) or (self.step > self.best_step + 20000):
-                    logger.Log("Best matched-dev accuracy: %s" %(self.best_dev_mat))
-                    logger.Log("MultiNLI Train accuracy: %s" %(self.best_mtrain_acc))
-                    logger.Log("Training with Dev data")
-                    self.train_dev_set = True
-                    if dev_cost_mat < mtrain_cost:
-                        self.completed = True 
-                        break
-            else:
-                if (progress < 0.1) or (self.step > self.best_step + self.early_stopping_step):
-                    logger.Log("Best matched-dev accuracy: %s" %(self.best_dev_mat))
-                    logger.Log("MultiNLI Train accuracy: %s" %(self.best_mtrain_acc))
-                    if config.training_completely_on_snli:
-                        self.train_dev_set = True
 
-                        # if dev_cost_snli < strain_cost:
-                        self.completed = True
-                        break
-                    else:
-                        self.completed = True
-                        break
+            if (progress < 0.1) or (self.step > self.best_step + self.early_stopping_step):
+                logger.Log("Best matched-dev accuracy: %s" %(self.best_dev_mat))
+                logger.Log("MultiNLI Train accuracy: %s" %(self.best_mtrain_acc))
+                if config.training_completely_on_snli:
+                    self.train_dev_set = True
+
+                    # if dev_cost_snli < strain_cost:
+                    self.completed = True
+                    break
+                else:
+                    self.completed = True
+                    break
 
     def classify(self, examples):
         # This classifies a list of examples
@@ -396,11 +382,11 @@ class modelClassifier:
             logger.Log("Model restored from file: %s" % best_path)
 
         total_batch = int(len(examples) / self.batch_size)
-        pred_size = 3 * config.forced_num_multi_classes if config.force_multi_classes else 3
+        pred_size = 3 
         logits = np.empty(pred_size)
         genres = []
         costs = 0
-        positional_encoding = self.get_positional_encoding(self.sequence_length, 300)
+        
         for i in tqdm(range(total_batch + 1)):
             if i != total_batch:
                 minibatch_premise_vectors, minibatch_hypothesis_vectors, minibatch_labels, minibatch_genres, \
@@ -459,10 +445,9 @@ class modelClassifier:
             logger.Log("Model restored from file: %s" % best_path)
 
         total_batch = int(len(examples) / self.batch_size)
-        pred_size = 3 * config.forced_num_multi_classes if config.force_multi_classes else 3
+        pred_size = 3
         logits = np.empty(pred_size)
         costs = 0
-        positional_encoding = self.get_positional_encoding(self.sequence_length, 300)
         IDs = np.empty(1)
         for i in tqdm(range(total_batch + 1)):
             if i != total_batch:

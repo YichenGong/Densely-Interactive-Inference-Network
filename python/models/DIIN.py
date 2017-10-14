@@ -10,7 +10,6 @@ class MyModel(object):
         # tf.reset_default_graph()
         self.embedding_dim = emb_dim
         self.dim = hidden_dim
-        self.LSTM_dim = config.LSTM_dim
         self.sequence_length = seq_length
         self.pred_size = pred_size 
         self.context_seq_len = context_seq_len
@@ -141,14 +140,20 @@ class MyModel(object):
         # L2 Loss
         if config.l2_loss:
             if config.sigmoid_growing_l2loss:
-                weights_added = tf.add_n([tf.nn.l2_loss(tensor) for tensor in tf.trainable_variables() if tensor.name.endswith("weights:0") and not tensor.name.endswith("weighted_sum/weights:0")])
+                weights_added = tf.add_n([tf.nn.l2_loss(tensor) for tensor in tf.trainable_variables() if tensor.name.endswith("weights:0") and not tensor.name.endswith("weighted_sum/weights:0") or tensor.name.endswith('kernel:0')])
                 full_l2_step = tf.constant(config.weight_l2loss_step_full_reg , dtype=tf.int32, shape=[], name='full_l2reg_step')
-                full_l2_ratio = tf.constant(config.l2_regularization_ratio , dtype='float', shape=[], name='l2_regularization_ratio')
-                l2loss_ratio = tf.sigmoid( tf.cast((self.global_step - full_l2_step / 2) * 8, tf.float32) / tf.cast(full_l2_step / 2,tf.float32)) * full_l2_ratio
+                full_l2_ratio = tf.constant(config.l2_regularization_ratio , dtype=tf.float32, shape=[], name='l2_regularization_ratio')
+                gs_flt = tf.cast(self.global_step , tf.float32)
+                half_l2_step_flt = tf.cast(full_l2_step / 2 ,tf.float32)
+
+                # (self.global_step - full_l2_step / 2)
+                # tf.cast((self.global_step - full_l2_step / 2) * 8, tf.float32) / tf.cast(full_l2_step / 2 ,tf.float32)
+                # l2loss_ratio = tf.sigmoid( tf.cast((self.global_step - full_l2_step / 2) * 8, tf.float32) / tf.cast(full_l2_step / 2 ,tf.float32)) * full_l2_ratio
+                l2loss_ratio = tf.sigmoid( ((gs_flt - half_l2_step_flt) * 8) / half_l2_step_flt) * full_l2_ratio
                 tf.summary.scalar('l2loss_ratio', l2loss_ratio)
                 l2loss = weights_added * l2loss_ratio
             else:
-                l2loss = tf.add_n([tf.nn.l2_loss(tensor) for tensor in tf.trainable_variables() if tensor.name.endswith("weights:0")]) * tf.constant(config.l2_regularization_ratio , dtype='float', shape=[], name='l2_regularization_ratio')
+                l2loss = tf.add_n([tf.nn.l2_loss(tensor) for tensor in tf.trainable_variables() if tensor.name.endswith("weights:0") or tensor.name.endswith('kernel:0')]) * tf.constant(config.l2_regularization_ratio , dtype='float', shape=[], name='l2_regularization_ratio')
             tf.summary.scalar('l2loss', l2loss)
             self.total_cost += l2loss
 
@@ -156,51 +161,44 @@ class MyModel(object):
             diffs = []
             for i in range(config.self_att_enc_layers):
                 for tensor in tf.trainable_variables():
-                    
-                    if tensor.name == "prepro/{}_layer_self_att_enc/self_attention/h_logits/first/weights:0".format(i):
+                    print(tensor.name)
+                    if tensor.name == "prepro/{}_layer_self_att_enc/self_attention/h_logits/first/kernel:0".format(i):
                         l_lg = tensor 
-                    elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_attention/h_logits/first/weights:0".format(i):
+                    elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_attention/h_logits/first/kernel:0".format(i):
                         r_lg = tensor 
-                    elif tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/lhs_1/weights:0".format(i):    
+                    elif tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/lhs_1/kernel:0".format(i):    
                         l_fg_lhs_1 = tensor 
-                    elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/lhs_1/weights:0".format(i):
+                    elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/lhs_1/kernel:0".format(i):
                         r_fg_lhs_1= tensor
-                    elif tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/rhs_1/weights:0".format(i):
+                    elif tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/rhs_1/kernel:0".format(i):
                         l_fg_rhs_1= tensor
-                    elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/rhs_1/weights:0".format(i):
+                    elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/rhs_1/kernel:0".format(i):
                         r_fg_rhs_1= tensor
-                    elif tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/lhs_2/weights:0".format(i):
+                    elif tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/lhs_2/kernel:0".format(i):
                         l_fg_lhs_2= tensor
-                    elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/lhs_2/weights:0".format(i):
+                    elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/lhs_2/kernel:0".format(i):
                         r_fg_lhs_2= tensor
-                    elif tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/rhs_2/weights:0".format(i):
+                    elif tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/rhs_2/kernel:0".format(i):
                         l_fg_rhs_2= tensor
-                    elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/rhs_2/weights:0".format(i):
+                    elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/rhs_2/kernel:0".format(i):
                         r_fg_rhs_2= tensor
 
                     if config.two_gate_fuse_gate:
-                        if tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/lhs_3/weights:0".format(i):    
+                        if tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/lhs_3/kernel:0".format(i):    
                             l_fg_lhs_3 = tensor 
-                        elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/lhs_3/weights:0".format(i):
+                        elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/lhs_3/kernel:0".format(i):
                             r_fg_lhs_3 = tensor
-                        elif tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/rhs_3/weights:0".format(i):
+                        elif tensor.name == "prepro/{}_layer_self_att_enc/self_att_fuse_gate/rhs_3/kernel:0".format(i):
                             l_fg_rhs_3 = tensor
-                        elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/rhs_3/weights:0".format(i):
+                        elif tensor.name == "prepro/{}_layer_self_att_enc_h/self_att_fuse_gate/rhs_3/kernel:0".format(i):
                             r_fg_rhs_3 = tensor
 
                 diffs += [l_lg - r_lg, l_fg_lhs_1 - r_fg_lhs_1, l_fg_rhs_1 - r_fg_rhs_1, l_fg_lhs_2 - r_fg_lhs_2, l_fg_rhs_2 - r_fg_rhs_2]
                 if config.two_gate_fuse_gate:
                     diffs += [l_fg_lhs_3 - r_fg_lhs_3, l_fg_rhs_3 - r_fg_rhs_3]
             
-            if config.sigmoid_growing_l2_diff_loss:
-                weights_added = tf.add_n([tf.nn.l2_loss(tensor) for tensor in diffs])
-                full_l2_step = tf.constant(config.diff_l2_penalty_full_step , dtype=tf.int32, shape=[], name='full_l2reg_step')
-                diff_l2_ratio = tf.constant(config.diff_penalty_loss_ratio , dtype='float', shape=[], name='diff_penalty_loss_ratio')
-                diff_l2loss_ratio = tf.sigmoid(tf.cast((self.global_step - full_l2_step / 2) * 8, tf.float32) / tf.cast(full_l2_step / 2,tf.float32)) * diff_l2_ratio
-                tf.summary.scalar('diff_l2loss_ratio', diff_l2loss_ratio)
-                diff_loss = weights_added * diff_l2loss_ratio
-            else:
-                diff_loss = tf.add_n([tf.nn.l2_loss(tensor) for tensor in diffs]) * tf.constant(config.diff_penalty_loss_ratio , dtype='float', shape=[], name='diff_penalty_loss_ratio')
+
+            diff_loss = tf.add_n([tf.nn.l2_loss(tensor) for tensor in diffs]) * tf.constant(config.diff_penalty_loss_ratio , dtype='float', shape=[], name='diff_penalty_loss_ratio')
             tf.summary.scalar('diff_penalty_loss', diff_loss)
             self.total_cost += diff_loss
 
@@ -209,7 +207,7 @@ class MyModel(object):
 
         total_parameters = 0
         for v in tf.global_variables():
-            if not v.name.endswith("weights:0") and not v.name.endswith("biases:0"):
+            if not v.name.endswith("weights:0") and not v.name.endswith("biases:0") and not v.name.endswith('kernel:0') and not v.name.endswith('bias:0'):
                 continue
             print(v.name)
             # print(type(v.name))

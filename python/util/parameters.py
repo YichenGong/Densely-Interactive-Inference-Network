@@ -43,10 +43,10 @@ pa("--keep_rate", type=float, default=1.0, help="Keep rate for dropout in the mo
 pa("--input_keep_rate", type=float, default=0.8, help='keep rate for embedding')
 pa("--use_input_dropout", action='store_true', help='use input dropout')
 pa("--seq_length", type=int, default=48, help="Max sequence length")
-pa("--emb_train", action='store_true', help="Call if you want to make your word embeddings trainable.")
+pa("--emb_train", action='store_false', help="Call if you want to make your word embeddings trainable.")
 
 pa("--genre", type=str, help="Which genre to train on")
-pa("--alpha", type=float, default=0., help="What percentage of SNLI data to use in training")
+pa("--alpha", type=float, default=0.15, help="What percentage of SNLI data to use in training")
 
 pa("--test", action='store_true', help="Call if you want to only test on the best checkpoint.")
 pa("--preprocess_data_only", action='store_true', help='preprocess_data_only')
@@ -68,7 +68,7 @@ pa("--use_label_smoothing", action='store_true', help='label smoothing')
 pa("--label_smoothing_ratio", type=float, default=0.05, help='label smoothing ratio')
 
 # Switches
-pa("--l2_loss", action='store_true', help='have l2 loss') ##
+pa("--l2_loss", action='store_false', help='have l2 loss') ##
 pa("--gradient_clip_value", default=1.0, type=float, help='gradient clip value')
 pa("--show_by_step", action='store_true', help='show by step')
 
@@ -88,7 +88,7 @@ pa("--highway_network_output_size", type=int, default=None, help='highway_networ
 pa("--additional_concat_out", action='store_true', help="dynamic concat p and h out")
 
 
-pa("--self_attention_encoding", action='store_true', help='have self attention encoding instead of biLSTM') ##
+pa("--self_attention_encoding", action='store_false', help='have self attention encoding instead of biLSTM') ##
 pa("--self_att_enc_layers", type=int, default=1, help='num layers self att enc') ##
 
 
@@ -101,7 +101,7 @@ pa("--cross_att_residual_conn", action='store_true', help='cross attention resid
 pa("--dense_logit_features_num", type=int, default=20, help='dense logit feature number')
 
 pa("--self_att_wo_residual_conn", action='store_true', help='self att without residual connection')
-pa("--self_att_fuse_gate_residual_conn", action='store_true', help='self att fuse gate residual connection') ##
+pa("--self_att_fuse_gate_residual_conn", action='store_false', help='self att fuse gate residual connection') ##
 pa("--self_att_fuse_gate_relu_z", action='store_true', help='relu instead of tanh')
 pa("--conv_fuse_gate_out_origx_base", action='store_true', help='conv_fuse_gate_out_origx_base')
 pa("--conv_fuse_gate_out_newx_base", action='store_true', help='conv_fuse_gate_out_newx_base')
@@ -121,11 +121,11 @@ pa("--last_avg_pooling", action='store_true', help='last avg pooling')
 
 pa("--highway_use_tanh", action='store_true', help='highway network use tanh activation')
 pa("--conv_use_tanh_act", action='store_true', help='tanh becomes the legendary activation function of convolution')
-pa("--two_gate_fuse_gate", action='store_true', help='inside fuse gate we have two f gates') ##
+pa("--two_gate_fuse_gate", action='store_false', help='inside fuse gate we have two f gates') ##
 
 pa("--self_att_head_num", type=int, default=3, help='multi-head num')
 pa("--use_dense_att_multi_head_self_att", action='store_true', help='use dense attention version of multi head self att')
-pa("--dense_attention_dropout", action='store_true', help='dropout on dense attention features') ##
+pa("--dense_attention_dropout", action='store_false', help='dropout on dense attention features') ##
 pa("--out_channel_dims", type=str, default="100")
 pa("--filter_heights", type=str, default="5")
 
@@ -133,34 +133,34 @@ pa("--wo_conv_dim_matching_res_conn", action='store_true', help='there is no dim
 
 
 
-pa("--super_dense_attention", action='store_true', help='super dense attention') ##
+pa("--super_dense_attention", action='store_false', help='super dense attention') ##
 
 
-pa("--wo_enc_sharing", action='store_true', help='woencsharing') ##
+pa("--wo_enc_sharing", action='store_false', help='woencsharing') ##
 pa("--diff_penalty_loss_ratio", type=float, default=1e-3, help='diff_penalty_loss_ratio') ##
 
-pa("--dropout_keep_rate_decay", action='store_true', help="dropout_keep_rate_decay") ##
+pa("--dropout_keep_rate_decay", action='store_false', help="dropout_keep_rate_decay") ##
 pa("--dropout_decay_step",  type=int, default=10000, help='dropout_decay_step') ##
 pa("--dropout_decay_rate",  type=float, default=0.977, help='dropout_decay_rate') ##
 
 
-pa("--sigmoid_growing_l2loss", action='store_true', help='parameterized_l2loss') ##
+pa("--sigmoid_growing_l2loss", action='store_false', help='parameterized_l2loss') ##
 pa("--weight_l2loss_step_full_reg", type=int, default=100000, help='weight_l2loss_step_full_reg') ##
 
 
 pa("--transitioning_conv_blocks", action='store_true', help='transitioning conv blocks')
-pa("--use_dense_net", action='store_true', help='use dense net') ##
+pa("--use_dense_net", action='store_false', help='use dense net') ##
 pa("--dense_net_growth_rate", type=int, default=20, help='dense net growth rate') ##
 pa("--first_transition_growth_rate", type=int, default=2, help='first_transition_growth_rate')
 pa("--dense_net_layers", type=int, default=8, help='dense net layers') ##
 pa("--dense_net_bottleneck_size", type=int, default=500, help='dense net bottleneck size')
 pa("--dense_net_transition_rate", type=float, default=0.5, help='dense_net_transition_rate') ##
-pa("--dense_net_transition_layer_max_pooling", action='store_true', help='dense net transition layer max pooling') ##
-pa("--dense_net_wo_bottleneck", action='store_true', help='dense net without bottleneck') ##
+pa("--dense_net_transition_layer_max_pooling", action='store_false', help='dense net transition layer max pooling') ##
+pa("--dense_net_wo_bottleneck", action='store_false', help='dense net without bottleneck') ##
 pa("--dense_net_act_before_conv", action='store_true', help='dense_net_act_before_conv')
 pa("--dense_net_kernel_size", default=3, help='dense net kernel size')
 pa("--rm_first_transition_layer", action='store_true', help='rm_first_transition_layer')
-pa("--first_scale_down_layer", action='store_true', help='first_scale_down_layer') ##
+pa("--first_scale_down_layer", action='store_false', help='first_scale_down_layer') ##
 pa("--first_scale_down_layer_relu", action='store_true', help='first_scale_down_layer_relu') 
 pa("--first_scale_down_kernel", type=int, default=1, help='first_scale_down_kernel') ##
 

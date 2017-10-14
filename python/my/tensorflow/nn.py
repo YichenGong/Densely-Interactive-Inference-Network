@@ -20,7 +20,7 @@ def linear(args, output_size, bias, bias_start=0.0, scope=None, squeeze=False, w
         assert is_train is not None
         flat_args = [tf.cond(is_train, lambda: tf.nn.dropout(arg, input_keep_prob), lambda: arg)
                          for arg in flat_args]
-        flat_out = _linear(flat_args, output_size, bias, bias_start=bias_start)
+        flat_out = _linear(flat_args, output_size, bias)
         out = reconstruct(flat_out, args[0], 1)
         if squeeze:
             out = tf.squeeze(out, [len(args[0].get_shape().as_list())-1])
@@ -290,23 +290,23 @@ def fuse_gate(config, is_train, lhs, rhs, scope=None):
     with tf.variable_scope(scope or "fuse_gate"):
         dim = lhs.get_shape().as_list()[-1]
         # z
-        if config.fuse_gate_KR_1_0:
-            lhs_1 = linear(lhs, dim ,True, bias_start=0.0, scope="lhs_1", squeeze=False, wd=config.wd, input_keep_prob=1.0, is_train=is_train)
-            rhs_1 = linear(rhs, dim ,True, bias_start=0.0, scope="rhs_1", squeeze=False, wd=0.0, input_keep_prob=1.0, is_train=is_train)
-        else:
-            lhs_1 = linear(lhs, dim ,True, bias_start=0.0, scope="lhs_1", squeeze=False, wd=config.wd, input_keep_prob=config.keep_rate, is_train=is_train)
-            rhs_1 = linear(rhs, dim ,True, bias_start=0.0, scope="rhs_1", squeeze=False, wd=0.0, input_keep_prob=config.keep_rate, is_train=is_train)
+        # if config.fuse_gate_KR_1_0:
+        #     lhs_1 = linear(lhs, dim ,True, bias_start=0.0, scope="lhs_1", squeeze=False, wd=config.wd, input_keep_prob=1.0, is_train=is_train)
+        #     rhs_1 = linear(rhs, dim ,True, bias_start=0.0, scope="rhs_1", squeeze=False, wd=0.0, input_keep_prob=1.0, is_train=is_train)
+        # else:
+        lhs_1 = linear(lhs, dim ,True, bias_start=0.0, scope="lhs_1", squeeze=False, wd=config.wd, input_keep_prob=config.keep_rate, is_train=is_train)
+        rhs_1 = linear(rhs, dim ,True, bias_start=0.0, scope="rhs_1", squeeze=False, wd=0.0, input_keep_prob=config.keep_rate, is_train=is_train)
         if config.self_att_fuse_gate_residual_conn and config.self_att_fuse_gate_relu_z:
             z = tf.nn.relu(lhs_1 + rhs_1)
         else:
             z = tf.tanh(lhs_1 + rhs_1)
         # f
-        if config.fuse_gate_KR_1_0:
-            lhs_2 = linear(lhs, dim ,True, bias_start=0.0, scope="lhs_2", squeeze=False, wd=config.wd, input_keep_prob=1.0, is_train=is_train)
-            rhs_2 = linear(rhs, dim ,True, bias_start=0.0, scope="rhs_2", squeeze=False, wd=config.wd, input_keep_prob=1.0, is_train=is_train)
-        else:
-            lhs_2 = linear(lhs, dim ,True, bias_start=0.0, scope="lhs_2", squeeze=False, wd=config.wd, input_keep_prob=config.keep_rate, is_train=is_train)
-            rhs_2 = linear(rhs, dim ,True, bias_start=0.0, scope="rhs_2", squeeze=False, wd=config.wd, input_keep_prob=config.keep_rate, is_train=is_train)
+        # if config.fuse_gate_KR_1_0:
+        #     lhs_2 = linear(lhs, dim ,True, bias_start=0.0, scope="lhs_2", squeeze=False, wd=config.wd, input_keep_prob=1.0, is_train=is_train)
+        #     rhs_2 = linear(rhs, dim ,True, bias_start=0.0, scope="rhs_2", squeeze=False, wd=config.wd, input_keep_prob=1.0, is_train=is_train)
+        # else:
+        lhs_2 = linear(lhs, dim ,True, bias_start=0.0, scope="lhs_2", squeeze=False, wd=config.wd, input_keep_prob=config.keep_rate, is_train=is_train)
+        rhs_2 = linear(rhs, dim ,True, bias_start=0.0, scope="rhs_2", squeeze=False, wd=config.wd, input_keep_prob=config.keep_rate, is_train=is_train)
         f = tf.sigmoid(lhs_2 + rhs_2)
 
         if config.two_gate_fuse_gate:
@@ -317,8 +317,6 @@ def fuse_gate(config, is_train, lhs, rhs, scope=None):
         else:   
             out = f * lhs + (1 - f) * z
 
-        if config.fuse_gate_dropout_at_the_end:
-            out = tf.cond(is_train, lambda: tf.nn.dropout(out, config.keep_rate), lambda: out)
         return out
 
 

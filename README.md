@@ -2,8 +2,31 @@
 
 This is the code to reproduce the model in [Natural Language Inference over Interaction Space](https://arxiv.org/abs/1709.04348).
 
+## Setup
+	$ git clone https://github.com/YichenGong/Densely-Interactive-Inference-Network.git
+	$ cd Densely-Interactive-Inference-Network
+	$ pip install -r requirements.txt
+
+## Download Data
+* download and unzip [SNLI 1.0](https://nlp.stanford.edu/projects/snli/) and [MultiNLI 0.9](https://www.nyu.edu/projects/bowman/multinli/) data under data folder
+* [download](https://nlp.stanford.edu/projects/glove/) glove.840B.300d.txt under data folder
+* [download](https://drive.google.com/file/d/0B6CTyAhSHoJTa3ZSSE5QQUJrb3M/view?usp=sharing) preprocessed file shared.jsonl under data folder
 
 
+
+When you finish downloading, the folder should look like this:
+
+
+	$ cd data/
+	$ ls
+	glove.840B.300d.txt  multinli_0.9  shared.jsonl  snli_1.0
+	$ cd ..
+
+I don't recommend you to use multinli_1.0 here unless you want to spend 12 hours on preprocessing all the content again. If you really do, you need to manually edit path from 0.9 to 1.0 at python/util/parameters.py and delete shared.jsonl file. 
+
+## To run the code
+	$ cd python 
+	$ python train_mnli.py DIIN demo_testing
 
 
 

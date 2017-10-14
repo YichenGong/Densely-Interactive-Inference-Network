@@ -46,11 +46,8 @@ def load_nli_data(path, snli=False, shuffle = True):
             loaded_example = json.loads(line)
             if loaded_example["gold_label"] not in LABEL_MAP:
                 continue
-            if config.force_multi_classes:
-                l = LABEL_MAP[loaded_example["gold_label"]]
-                loaded_example["label"] = l * config.forced_num_multi_classes + random.choice(range(config.forced_num_multi_classes))
-            else:
-                loaded_example["label"] = LABEL_MAP[loaded_example["gold_label"]]
+            
+            loaded_example["label"] = LABEL_MAP[loaded_example["gold_label"]]
             if snli:
                 loaded_example["genre"] = "snli"
             data.append(loaded_example)
@@ -254,19 +251,14 @@ def sentences_to_padded_index_sequences(datasets):
         for example in tqdm(dataset):
             s1_tokenize = tokenize(example['sentence1_binary_parse'])
             s2_tokenize = tokenize(example['sentence2_binary_parse'])
-            if config.subword_random_init_embedding: 
-                for t in s1_tokenize:   
-                    word_counter.update(get_subword_list(t))
-                for t in s2_tokenize: 
-                    word_counter.update(get_subword_list(t))
-            else: 
-                word_counter.update(s1_tokenize)
-                word_counter.update(s2_tokenize)
 
-                for i, word in enumerate(s1_tokenize):
-                    char_counter.update([c for c in word])
-                for word in s2_tokenize:
-                    char_counter.update([c for c in word])
+            word_counter.update(s1_tokenize)
+            word_counter.update(s2_tokenize)
+
+            for i, word in enumerate(s1_tokenize):
+                char_counter.update([c for c in word])
+            for word in s2_tokenize:
+                char_counter.update([c for c in word])
 
         # shared_content = {k:v for k, v in shared_content.items()}
 
@@ -274,10 +266,8 @@ def sentences_to_padded_index_sequences(datasets):
 
     
 
-    if config.subword_random_init_embedding:
-        vocabulary = set([word for word in word_counter if word_counter[word] >= config.subword_retain_threshold])
-    else:
-        vocabulary = set([word for word in word_counter])
+
+    vocabulary = set([word for word in word_counter])
     vocabulary = list(vocabulary)
     if config.embedding_replacing_rare_word_with_UNK: 
         vocabulary = [PADDING, "<UNK>"] + vocabulary
@@ -293,64 +283,41 @@ def sentences_to_padded_index_sequences(datasets):
     indices_to_char = {v: k for k, v in char_indices.items()}
     
 
-    if config.random_crop_or_pad_sentence_by_seqlen:
-        for i, dataset in enumerate(datasets):
-            for example in tqdm(dataset):
-                for sentence in ['sentence1_binary_parse', 'sentence2_binary_parse']:
-                    example[sentence + '_index_sequence'] = []
-                    token_sequence = tokenize(example[sentence])
-                    example[sentence + '_char_index'] = []
-                    for token in token_sequence:
-                        example[sentence + '_index_sequence'].append(word_indices[token])
-                        chars = [char_indices[c] for c in token][:config.char_in_word_size]
-                        example[sentence + '_char_index'].append(chars)
+    for i, dataset in enumerate(datasets):
+        for example in tqdm(dataset):
+            for sentence in ['sentence1_binary_parse', 'sentence2_binary_parse']:
+                example[sentence + '_index_sequence'] = np.zeros((FIXED_PARAMETERS["seq_length"]), dtype=np.int32)
+                example[sentence + '_inverse_term_frequency'] = np.zeros((FIXED_PARAMETERS["seq_length"]), dtype=np.float32)
 
-    elif config.subword_random_init_embedding:
-        for i, dataset in enumerate(datasets):
-            for example in tqdm(dataset):
-                for sentence in ['sentence1_binary_parse', 'sentence2_binary_parse']:
-                    example[sentence + '_index_sequence'] = []
-                    token_sequence = tokenize(example[sentence])
-                    for token in token_sequence:
-                        example[sentence + '_index_sequence'].append([word_indices[subword] for subword in get_subword_list(token) if word_counter[subword] >= config.subword_retain_threshold])
-                        example[sentence + '_char_index'] = []
-
-    else:
-        for i, dataset in enumerate(datasets):
-            for example in tqdm(dataset):
-                for sentence in ['sentence1_binary_parse', 'sentence2_binary_parse']:
-                    example[sentence + '_index_sequence'] = np.zeros((FIXED_PARAMETERS["seq_length"]), dtype=np.int32)
-                    example[sentence + '_inverse_term_frequency'] = np.zeros((FIXED_PARAMETERS["seq_length"]), dtype=np.float32)
-
-                    token_sequence = tokenize(example[sentence])
-                    padding = FIXED_PARAMETERS["seq_length"] - len(token_sequence)
-                          
-                    for i in range(FIXED_PARAMETERS["seq_length"]):
-                        if i >= len(token_sequence):
-                            index = word_indices[PADDING]
-                            itf = 0
+                token_sequence = tokenize(example[sentence])
+                padding = FIXED_PARAMETERS["seq_length"] - len(token_sequence)
+                      
+                for i in range(FIXED_PARAMETERS["seq_length"]):
+                    if i >= len(token_sequence):
+                        index = word_indices[PADDING]
+                        itf = 0
+                    else:
+                        if config.embedding_replacing_rare_word_with_UNK:
+                            index = word_indices[token_sequence[i]] if word_counter[token_sequence[i]] >= config.UNK_threshold else word_indices["<UNK>"]
                         else:
-                            if config.embedding_replacing_rare_word_with_UNK:
-                                index = word_indices[token_sequence[i]] if word_counter[token_sequence[i]] >= config.UNK_threshold else word_indices["<UNK>"]
-                            else:
-                                index = word_indices[token_sequence[i]]
-                            itf = 1 / (word_counter[token_sequence[i]] + 1)
-                        example[sentence + '_index_sequence'][i] = index
-                        
-                        example[sentence + '_inverse_term_frequency'][i] = itf
+                            index = word_indices[token_sequence[i]]
+                        itf = 1 / (word_counter[token_sequence[i]] + 1)
+                    example[sentence + '_index_sequence'][i] = index
                     
-                    example[sentence + '_char_index'] = np.zeros((FIXED_PARAMETERS["seq_length"], config.char_in_word_size), dtype=np.int32)
-                    for i in range(FIXED_PARAMETERS["seq_length"]):
-                        if i >= len(token_sequence):
-                            continue
-                        else:
-                            chars = [c for c in token_sequence[i]]
-                            for j in range(config.char_in_word_size):
-                                if j >= (len(chars)):
-                                    break
-                                else:
-                                    index = char_indices[chars[j]]
-                                example[sentence + '_char_index'][i,j] = index 
+                    example[sentence + '_inverse_term_frequency'][i] = itf
+                
+                example[sentence + '_char_index'] = np.zeros((FIXED_PARAMETERS["seq_length"], config.char_in_word_size), dtype=np.int32)
+                for i in range(FIXED_PARAMETERS["seq_length"]):
+                    if i >= len(token_sequence):
+                        continue
+                    else:
+                        chars = [c for c in token_sequence[i]]
+                        for j in range(config.char_in_word_size):
+                            if j >= (len(chars)):
+                                break
+                            else:
+                                index = char_indices[chars[j]]
+                            example[sentence + '_char_index'][i,j] = index 
     
 
     return indices_to_words, word_indices, char_indices, indices_to_char
@@ -615,7 +582,7 @@ def loadEmbedding_rand(path, word_indices, divident = 1.0): # TODO double embedd
     # Explicitly assign embedding of <PAD> to be zeros.
     emb[0, :] = np.zeros((1,m), dtype="float32")
     
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding='utf-8') as f:
         for i, line in enumerate(f):
             if FIXED_PARAMETERS["embeddings_to_load"] != None:
                 if i >= FIXED_PARAMETERS["embeddings_to_load"]:

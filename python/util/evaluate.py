@@ -36,10 +36,6 @@ def evaluate_classifier(classifier, eval_set, batch_size):
     for i in range(hypotheses.shape[0]):
         hypothesis = hypotheses[i]
         label = eval_set[i]['label']
-        if config.force_multi_classes:
-            hypothesis = hypothesis / config.forced_num_multi_classes
-            label = eval_set[i]['label'] / config.forced_num_multi_classes
-
         if hypothesis == label:
             correct += 1 
         confusion_matrix[label][hypothesis] += 1 
