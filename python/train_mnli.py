@@ -517,15 +517,6 @@ elif test == False:
         classifier.generate_predictions_with_id(test_snli_path, test_snli)
         
     else:
-        logger.Log("Generating test matched answers.")
-        test_matched_path = os.path.join(FIXED_PARAMETERS["log_path"], "test_matched_submission_{}.csv".format(modname))
-        classifier.generate_predictions_with_id(test_matched_path, test_matched)
-
-        
-        logger.Log("Generate test mismatched answers.")
-        test_mismatched_path = os.path.join(FIXED_PARAMETERS["log_path"], "test_mismatched_submission_{}.csv".format(modname))
-        classifier.generate_predictions_with_id(test_mismatched_path, test_mismatched)
-
         logger.Log("Generating dev matched answers.")
         dev_matched_path = os.path.join(FIXED_PARAMETERS["log_path"], "dev_matched_submission_{}.csv".format(modname))
         classifier.generate_predictions_with_id(dev_matched_path, dev_matched)
@@ -548,16 +539,6 @@ else:
         matched_multinli_dev_set_eval = evaluate_classifier(classifier.classify, dev_matched, FIXED_PARAMETERS["batch_size"])
         logger.Log("Acc on matched multiNLI dev-set: %s" %(matched_multinli_dev_set_eval[0]))
         logger.Log("Confusion Matrix \n{}".format(matched_multinli_dev_set_eval[2]))
-
-
-        logger.Log("Generating test matched answers.")
-        test_matched_path = os.path.join(FIXED_PARAMETERS["log_path"], "test_matched_submission_{}.csv".format(modname))
-        classifier.generate_predictions_with_id(test_matched_path, test_matched)
-
-        
-        logger.Log("Generate test mismatched answers.")
-        test_mismatched_path = os.path.join(FIXED_PARAMETERS["log_path"], "test_mismatched_submission_{}.csv".format(modname))
-        classifier.generate_predictions_with_id(test_mismatched_path, test_mismatched)
 
         logger.Log("Generating dev matched answers.")
         dev_matched_path = os.path.join(FIXED_PARAMETERS["log_path"], "dev_matched_submission_{}.csv".format(modname))
