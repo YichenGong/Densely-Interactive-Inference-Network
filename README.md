@@ -2,6 +2,11 @@
 
 This is the code to reproduce the model in [Natural Language Inference over Interaction Space](https://arxiv.org/abs/1709.04348).
 
+##Environment
+	python 3.6
+	tensorflow >= 1.3
+
+
 ## Setup
 	$ git clone https://github.com/YichenGong/Densely-Interactive-Inference-Network.git
 	$ cd Densely-Interactive-Inference-Network
@@ -9,6 +14,7 @@ This is the code to reproduce the model in [Natural Language Inference over Inte
 
 ## Download Data
 * download and unzip [SNLI 1.0](https://nlp.stanford.edu/projects/snli/) and [MultiNLI 0.9](https://www.nyu.edu/projects/bowman/multinli/) data under data folder
+* download MultiNLI 0.9 [matched](https://www.kaggle.com/c/multinli-matched-open-evaluation/data) and [mismatched](https://www.kaggle.com/c/multinli-mismatched-open-evaluation/data) test set under data/multinli_0.9 folder
 * [download](https://nlp.stanford.edu/projects/glove/) glove.840B.300d.txt under data folder
 * [download](https://drive.google.com/file/d/0B6CTyAhSHoJTa3ZSSE5QQUJrb3M/view?usp=sharing) preprocessed file shared.jsonl under data folder
 
