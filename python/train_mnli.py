@@ -318,8 +318,7 @@ class modelClassifier:
                 if self.best_dev_mat > 0.777 and not config.training_completely_on_snli:
                     self.eval_step = 500
                     self.save_step = 500
-                    if config.discard_failed_sample:
-                        self.collect_failed_sample = True
+                    
 
 
 
