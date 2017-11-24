@@ -13,12 +13,12 @@ This is the code to reproduce the model in [Natural Language Inference over Inte
 	$ pip install -r requirements.txt
 
 ## Download Data
-First, run `download.py` for `SNLI`, `MultiNLI`, and the preprocessed files.
+First, run `download.py` for the datasets and the preprocessed file:
 
-`
-    $ cd data
-    $ python download.py
-`
+```
+$ cd data
+$ python download.py
+```
 
 Then, manually download download MultiNLI 0.9
 [matched](https://www.kaggle.com/c/multinli-matched-open-evaluation/data)
@@ -53,13 +53,13 @@ When you finish downloading, your data folder should look like this:
     ├── shared.json
     └── snli_1.0
         ├── Icon\015
-            ├── README.txt
-                ├── snli_1.0_dev.jsonl
-                    ├── snli_1.0_dev.txt
-                        ├── snli_1.0_test.jsonl
-                            ├── snli_1.0_test.txt
-                                ├── snli_1.0_train.jsonl
-                                    └── snli_1.0_train.txt
+        ├── README.txt
+        ├── snli_1.0_dev.jsonl
+        ├── snli_1.0_dev.txt
+        ├── snli_1.0_test.jsonl
+        ├── snli_1.0_test.txt
+        ├── snli_1.0_train.jsonl
+        └── snli_1.0_train.txt
 ```
 
 I don't recommend you to use multinli_1.0 here because the id doesn't match the id in preprocessed sample id.
