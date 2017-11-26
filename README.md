@@ -13,20 +13,54 @@ This is the code to reproduce the model in [Natural Language Inference over Inte
 	$ pip install -r requirements.txt
 
 ## Download Data
-* download and unzip [SNLI 1.0](https://nlp.stanford.edu/projects/snli/) and [MultiNLI 0.9](https://www.nyu.edu/projects/bowman/multinli/) data under data folder
-* download MultiNLI 0.9 [matched](https://www.kaggle.com/c/multinli-matched-open-evaluation/data) and [mismatched](https://www.kaggle.com/c/multinli-mismatched-open-evaluation/data) test set under data/multinli_0.9 folder
-* [download](https://nlp.stanford.edu/projects/glove/) glove.840B.300d.txt under data folder
-* [download](https://drive.google.com/file/d/0B6CTyAhSHoJTa3ZSSE5QQUJrb3M/view?usp=sharing) preprocessed file shared.jsonl under data folder
+First, run `download.py` for the datasets and the preprocessed file:
+
+```
+$ cd data
+$ python download.py
+```
+
+Then, manually download download MultiNLI 0.9
+[matched](https://www.kaggle.com/c/multinli-matched-open-evaluation/data)
+and [mismatched](https://www.kaggle.com/c/multinli-mismatched-open-evaluation/data)
+test set under data/multinli_0.9 folder
+
+If any of the auto download fails, you can manually download them from:
+* [SNLI 1.0](https://nlp.stanford.edu/projects/snli/)
+* [MultiNLI 0.9](https://www.nyu.edu/projects/bowman/multinli/)
+* [Glove](https://nlp.stanford.edu/projects/glove/)
+* [shared.json](https://drive.google.com/file/d/0B6CTyAhSHoJTa3ZSSE5QQUJrb3M/view?usp=sharing)
 
 
+When you finish downloading, your data folder should look like this:
 
-When you finish downloading, the folder should look like this:
-
-
-	$ cd data/
-	$ ls
-	glove.840B.300d.txt  multinli_0.9  shared.jsonl  snli_1.0
-	$ cd ..
+```
+    $ tree data
+    data
+    ├── download.py
+    ├── glove.840B.300d.txt
+    ├── multinli_0.9
+    │   ├── Icon\015
+    │   ├── multinli_0.9_dev_matched.jsonl
+    │   ├── multinli_0.9_dev_matched.txt
+    │   ├── multinli_0.9_dev_mismatched.jsonl
+    │   ├── multinli_0.9_dev_mismatched.txt
+    │   ├── multinli_0.9_test_matched_sample_submission.csv
+    │   ├── multinli_0.9_test_mismatched_sample_submission.csv
+    │   ├── multinli_0.9_train.jsonl
+    │   ├── multinli_0.9_train.txt
+    │   └── paper.pdf
+    ├── shared.json
+    └── snli_1.0
+        ├── Icon\015
+        ├── README.txt
+        ├── snli_1.0_dev.jsonl
+        ├── snli_1.0_dev.txt
+        ├── snli_1.0_test.jsonl
+        ├── snli_1.0_test.txt
+        ├── snli_1.0_train.jsonl
+        └── snli_1.0_train.txt
+```
 
 I don't recommend you to use multinli_1.0 here because the id doesn't match the id in preprocessed sample id.
 
