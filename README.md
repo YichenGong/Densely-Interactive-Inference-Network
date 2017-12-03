@@ -2,9 +2,9 @@
 
 This is the code to reproduce the model in [Natural Language Inference over Interaction Space](https://arxiv.org/abs/1709.04348).
 
-##Environment
+## Environment
 	python 3.6
-	tensorflow >= 1.3
+	tensorflow = 1.3
 
 
 ## Setup
