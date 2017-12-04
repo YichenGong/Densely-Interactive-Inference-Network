@@ -452,16 +452,12 @@ class modelClassifier:
             if i != total_batch:
                 minibatch_premise_vectors, minibatch_hypothesis_vectors, minibatch_labels, minibatch_genres, \
                 minibatch_pre_pos, minibatch_hyp_pos, pairIDs, premise_char_vectors, hypothesis_char_vectors, \
-                premise_exact_match, hypothesis_exact_match, premise_inverse_term_frequency, \
-                hypothesis_inverse_term_frequency, premise_antonym_feature, hypothesis_antonym_feature, premise_NER_feature, \
-                hypothesis_NER_feature  = self.get_minibatch(
+                premise_exact_match, hypothesis_exact_match = self.get_minibatch(
                     examples, self.batch_size * i, self.batch_size * (i + 1))
             else:
                 minibatch_premise_vectors, minibatch_hypothesis_vectors, minibatch_labels, minibatch_genres, \
                 minibatch_pre_pos, minibatch_hyp_pos, pairIDs, premise_char_vectors, hypothesis_char_vectors, \
-                premise_exact_match, hypothesis_exact_match, premise_inverse_term_frequency, \
-                hypothesis_inverse_term_frequency, premise_antonym_feature, hypothesis_antonym_feature, premise_NER_feature, \
-                hypothesis_NER_feature  = self.get_minibatch(
+                premise_exact_match, hypothesis_exact_match = self.get_minibatch(
                     examples, self.batch_size * i, len(examples))
             feed_dict = {self.model.premise_x: minibatch_premise_vectors, 
                                 self.model.hypothesis_x: minibatch_hypothesis_vectors,
