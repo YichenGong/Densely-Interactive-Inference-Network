@@ -326,8 +326,8 @@ class modelClassifier:
                     self.eval_step = 100
                     self.save_step = 100
                     self.dont_print_unnecessary_info = True 
-                    if config.use_sgd_at_the_end:
-                        self.optimizer =  tf.train.GradientDescentOptimizer(0.00001).minimize(self.model.total_cost, global_step = self.global_step)
+                    # if config.use_sgd_at_the_end:
+                    #     self.optimizer =  tf.train.GradientDescentOptimizer(0.00001).minimize(self.model.total_cost, global_step = self.global_step)
 
 
                 if self.best_dev_mat > 0.872 and config.training_completely_on_snli:
