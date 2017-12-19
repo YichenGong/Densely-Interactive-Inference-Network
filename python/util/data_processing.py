@@ -635,8 +635,9 @@ def save_submission(path, ids, pred_ids):
     f = open(path, 'w')
     f.write("pairID,gold_label\n")
     for i in range(ids.shape[0]):
-        pred = pred_ids[i] if not config.force_multi_classes else pred_ids[i] / config.forced_num_multi_classes
+        pred = pred_ids[i]
         f.write("{},{}\n".format(str(ids[i]), reverse_label_map[str(pred)]))
+        # f.write("{},{}\n".format(str(ids[i]), str(pred)))
     f.close()
 
 

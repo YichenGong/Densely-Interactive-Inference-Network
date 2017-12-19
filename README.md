@@ -67,9 +67,9 @@ I don't recommend you to use multinli_1.0 here because the id doesn't match the 
 ## To run the code
 	$ cd python 
 	# on MultiNLI
-	$ python train_mnli.py DIIN demo_testing 
+	$ PYTHONHASHSEED=0 python train_mnli.py DIIN demo_testing 
 	# on SNLI
-	$ python train_mnli.py DIIN demo_testing_SNLI --training_completely_on_snli
+	$ PYTHONHASHSEED=0 python train_mnli.py DIIN demo_testing_SNLI --training_completely_on_snli
 
 
 
