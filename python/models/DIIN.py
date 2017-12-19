@@ -133,10 +133,10 @@ class MyModel(object):
         self.acc = tf.reduce_mean(tf.cast(tf.equal(tf.arg_max(self.logits, dimension=1),tf.cast(self.y,tf.int64)), tf.float32))
         tf.summary.scalar('acc', self.acc)
         tf.summary.scalar('loss', self.total_cost)
-        self.auc_ROC = tf.metrics.auc(tf.cast(self.y,tf.int64), tf.arg_max(self.logits, dimension=1), curve = 'ROC')
-        self.auc_PR =  tf.metrics.auc(tf.cast(self.y,tf.int64), tf.arg_max(self.logits, dimension=1), curve = 'PR')
-        tf.summary.scalar('auc_ROC', self.auc_ROC)
-        tf.summary.scalar('auc_PR', self.auc_PR)
+        #self.auc_ROC = tf.metrics.auc(tf.cast(self.y,tf.int64), tf.arg_max(self.logits, dimension=1), curve = 'ROC')
+        #self.auc_PR =  tf.metrics.auc(tf.cast(self.y,tf.int64), tf.arg_max(self.logits, dimension=1), curve = 'PR')
+        #tf.summary.scalar('auc_ROC', self.auc_ROC)
+        #tf.summary.scalar('auc_PR', self.auc_PR)
         # calculate acc 
         
         # L2 Loss
