@@ -475,7 +475,7 @@ class modelClassifier:
             logits = np.vstack([logits, logit])
         IDs = IDs[1:]
         logits = np.argmax(logits[1:], axis=1)
-        save_submission(path, IDs, logits[1:])
+        save_submission(path, IDs, logits)
 
 
 
