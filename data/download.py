@@ -73,5 +73,14 @@ if __name__ == '__main__':
     unzip(download(vector_url))
 
     proprocessed_shared_file_id = "0B6CTyAhSHoJTa3ZSSE5QQUJrb3M"
-    download_file_from_google_drive(proprocessed_shared_file_id, "shared.jsonl")
+    download_file_from_google_drive(proprocessed_shared_file_id, "shared.jsonl") 
+
+    # https://drive.google.com/file/d/1MddwhXZvsWSZZsvL_5oaOsJZFOshG6Dj/view?usp=sharing 
+    # multinli_0.9_test_matched_unlabeled.jsonl
+    # https://drive.google.com/file/d/1mzJFQ-BgkXJEr-fjv6L0t7SryeF546Cl/view?usp=sharing
+    # multinli_0.9_test_mismatched_unlabeled.jsonl 
+    multinli_matched_test = "1MddwhXZvsWSZZsvL_5oaOsJZFOshG6Dj" 
+    download_file_from_google_drive(multinli_matched_test, "multinli_0.9/multinli_0.9_test_matched_unlabeled.jsonl") 
+    multinli_mismatched_test = "1mzJFQ-BgkXJEr-fjv6L0t7SryeF546Cl"
+    download_file_from_google_drive(multinli_mismatched_test, "multinli_0.9/multinli_0.9_test_mismatched_unlabeled.jsonl") 
     print("Done.")

@@ -29,7 +29,7 @@ If any of the auto download fails, you can manually download them from:
 * [SNLI 1.0](https://nlp.stanford.edu/projects/snli/)
 * [MultiNLI 0.9](https://www.nyu.edu/projects/bowman/multinli/)
 * [Glove](https://nlp.stanford.edu/projects/glove/)
-* [shared.json](https://drive.google.com/file/d/0B6CTyAhSHoJTa3ZSSE5QQUJrb3M/view?usp=sharing)
+* [shared.jsonl](https://drive.google.com/file/d/0B6CTyAhSHoJTa3ZSSE5QQUJrb3M/view?usp=sharing)
 
 
 When you finish downloading, your data folder should look like this:
@@ -50,7 +50,7 @@ When you finish downloading, your data folder should look like this:
     │   ├── multinli_0.9_train.jsonl
     │   ├── multinli_0.9_train.txt
     │   └── paper.pdf
-    ├── shared.json
+    ├── shared.jsonl
     └── snli_1.0
         ├── Icon\015
         ├── README.txt
