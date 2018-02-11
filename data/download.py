@@ -73,5 +73,5 @@ if __name__ == '__main__':
     unzip(download(vector_url))
 
     proprocessed_shared_file_id = "0B6CTyAhSHoJTa3ZSSE5QQUJrb3M"
-    download_file_from_google_drive(proprocessed_shared_file_id, "shared.json")
+    download_file_from_google_drive(proprocessed_shared_file_id, "shared.jsonl")
     print("Done.")
