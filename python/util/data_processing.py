@@ -41,7 +41,7 @@ def load_nli_data(path, snli=False, shuffle = True):
     If the "snli" parameter is set to True, a genre label of snli will be assigned to the data. 
     """
     data = []
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         for line in tqdm(f):
             loaded_example = json.loads(line)
             if loaded_example["gold_label"] not in LABEL_MAP:
